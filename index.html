@@ -1,0 +1,107 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <style>
+        th {
+            min-width: 80px;
+        }
+        .product-img {
+            max-width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product Info</th>
+                    <th>Quantity</th>
+                    <th>Price (per unit)</th>
+                    <th>Price (subtotal)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="productData"></tbody>
+            <tfoot id="table-footer">
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td id="grandTotal">$0</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <script>
+        var product = [
+            { image: "https://m.media-amazon.com/images/I/51CazxvAl9L.AC_UL480_FMwebp_QL65.jpg", count: 2, title: "Fortunata Window Hardware - decorative Holdbacks - Mocha", price: 10 },
+            { image: "https://m.media-amazon.com/images/I/51pL62tEGVL.AC_UL480_FMwebp_QL65.jpg", count: 1, title: "Woven Trellis window hardware - Clip Rings - Bronze", price: 15 }
+        ];
+
+        function getProductTotal(index) {
+            let productCount = product[index].count;
+            document.getElementById(`subTotal${index}`).innerHTML = "$" + (product[index].price * productCount);
+            console.log("getProductTotal");
+            productTotalFinal();
+        }
+
+        function productTotalFinal() {
+            console.log("productTotalFinal");
+            const productTotal = product.reduce((total, product) => {
+                return total + (product.price * product.count)
+            }, 0);
+            document.getElementById("grandTotal").innerHTML = "$" + productTotal;
+        }
+
+        function getProductCount(index, el) {
+            product[index].count = el.value;
+            getProductTotal(index);
+        }
+
+        function removeProduct(index) {
+            console.log("index", index);
+            product.splice(index, 1);
+            renderProducts();
+            if(product.length == 0) {
+                document.getElementById("productData").innerHTML = `<tr><td colspan="5" class="text-center">No Products Found</td></tr>`;
+                document.getElementById("table-footer").classList.add("d-none")
+            }
+        }
+        
+        function renderProducts() {
+            const productList = product.map((item, index)=>{
+                return `
+                    <tr>
+                        <td>
+                            <img class="product-img" src="${item.image}" alt="img" />
+                            <p>${item.title}</p>
+                        </td>
+                        <td>
+                            <input id="product${index}" type="text" value="${item.count}" onkeyup="getProductCount(${index}, this)" class="form-control"/>
+                        </td>
+                        <td>$${item.price}</td>
+                        <td id="subTotal${index}">$${item.price * item.count}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger" onclick="removeProduct(${index})">Remove</button>    
+                        </td>
+                    </tr>`
+            })
+            document.getElementById("productData").innerHTML = productList.join("");
+            productTotalFinal();
+        }
+
+        renderProducts();
+
+    </script>
+</body>
+</html>
